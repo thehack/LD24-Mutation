@@ -6,3 +6,6 @@ It is the year 2050. Mankind has finally achieved an elusive goal: interplanetar
 
 Our hero survives a crash landing on the Martian surface, but the ship doesn't. The ship's nuclear core is leaking onto the Martian soil, endangering Martians. The creatures who have been exposed to the spilling nuclear core are mutating! Mutated Martians are now becoming violent. Our hero must contain the spill to save himself, the mission, and Mars!
 
+##The In-Progress Game
+http://thehack.github.com/LD24-Mutation/mutation.html
+
