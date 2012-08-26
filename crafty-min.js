@@ -16,28 +16,46 @@
 
 window.onload = function() {
 
+	var VIEWPORTWIDTH = 960;
+	var VIEWPORTHEIGHT = 480;
+	var MAPWIDTH = 1600;
+	var MAPHEIGHT = 1200;
+	var mapXCenter = MAPWIDTH/2
+	var mapYCenter = MAPHEIGHT/2
 	Crafty.init();
-	Crafty.canvas.init();
-
-	var xCenter = parseInt(Crafty.viewport.width/2);
-	var yCenter = parseInt(Crafty.viewport.height/2);
 	
-    Crafty.sprite(50, 'astro2.png', {player: [0,0]});
+    Crafty.sprite(50, 'assets/astro2.png', {player: [0,0]});
+    Crafty.sprite(40, 'assets/alien2.png', {alien: [0,0]});
     
     //place the our Hero
     Crafty.scene("main", function() {
-    	var bg = Crafty.e("2D, Canvas, Image")
-             .attr({w: Crafty.viewport.width, h: Crafty.viewport.height})
-             .image("mars2.png", "repeat");
-		Crafty.e('2D, Canvas, player, RightControls, Hero, Collision, Solid')
-			.attr({x: xCenter, y: yCenter})
+    	
+    	Crafty.e("2D, DOM, Image")
+             .attr({w: MAPWIDTH, h: MAPHEIGHT})
+             .image("assets/mars2.png", "repeat");
+
+		player = Crafty.e('2D, DOM, player, RightControls, Hero, Collision, Solid')
+			.attr({x: mapXCenter, y: mapYCenter})
 	        .rightControls(3);
+	    Crafty.viewport.follow(player);
+
+	    //aliens
+	    for (var i = 0; i < 20; i++) {
+	    	Crafty.e('2D, DOM, alien, Martian')
+	    	.attr({x: Crafty.math.randomInt(40, (MAPWIDTH - 40)), y: Crafty.math.randomInt(40, (MAPHEIGHT - 40))});
+	    };
+
 	});
 
 	Crafty.scene("loading", function() {
-		Crafty.background('#000000');
-		Crafty.e("2D, DOM, Text").attr({ x: 100, y: 100 }).text("Loading...");
-        Crafty.load(["astro2.png", "mars2.png"], function() {Crafty.scene("main"); });
+		Crafty.background('#cccccc');
+		Crafty.e("2D, DOM, Text").attr({ x: (VIEWPORTWIDTH/2 -30), y: VIEWPORTHEIGHT/2 }).text("Loading...");
+        Crafty.load(["assets/astro2.png", "assets/mars2.png"], 
+        	function() {
+        		setTimeout( 
+        			function() {Crafty.scene("main"); },1000);
+        	}
+        );
 
     });
 
@@ -90,6 +108,62 @@ window.onload = function() {
 		return this;	
     	}
     });
+	
+	// Template for Martians who move
+	Crafty.c('Martian', {
+		init: function() {
+			var directions = [  {name:  'north', x: 0, y: -1, spriteRow: 0}, 
+                                {name:  'east',  x: 1, y: 0, spriteRow: 0}, 
+                                {name:  'south', x: 0, y: 1, spriteRow: 0}, 
+                                {name:  'west',  x: -1, y: 0, spriteRow: 0}    ];
+            
+            // pick a direction to get started...
+            if (!direction) {
+            	var direction = directions[Crafty.math.randomInt(0,0)];
+            }
+            this.requires('SpriteAnimation, Collision')
+            	.animate('north',0,0,1)
+            	.animate('east',2,0,3)
+            	.animate('south',4,0,5)
+            	.animate('west',6,0,7)
+            	.bind('EnterFrame', function() {
+            		//keep them in the frame
+            		if (this.x < this.w) {
+            			direction = directions[1];
+            		}
+            		if (this.x > (MAPWIDTH - 40)) {
+            			direction = directions[3];
+            		}
+            		if (this.y < this.h) {
+            			direction = directions[2];
+            		}
+            		if (this.y > (MAPHEIGHT - 40)) {
+            			direction = directions[0];
+            		}
+
+            		direction = pickNewDirection();
+            		this.animate(direction.name, 12);
+            		this.x += direction.x;
+            		this.y += direction.y;
+
+            		// I will put alien reproduction here...
+            		// alienBirth(this.x, this.y);
+
+            	});
+            	// do something with the collision here:
+            	this.onHit('Hero', function() {console.log('impact!')});
+
+            	// change directions every three seconds
+            	var pickNewDirection = function() {
+            		if (Crafty.math.randomInt(0, 150) === 75) {
+            			direction = directions[Crafty.math.randomInt(0, 3)];
+            		}
+            		return direction;
+            	};
+
+		}
+	});
+
 
     // Directional input component
     Crafty.c('RightControls', {
@@ -101,4 +175,6 @@ window.onload = function() {
     		return this;
     	}
     });
+
+
 };
