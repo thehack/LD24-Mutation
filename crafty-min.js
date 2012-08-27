@@ -23,9 +23,11 @@ window.onload = function() {
 	var mapXCenter = MAPWIDTH/2
 	var mapYCenter = MAPHEIGHT/2
 	Crafty.init();
+	Crafty.canvas.init();
 	
-    Crafty.sprite(50, 'assets/astro2.png', {player: [0,0]});
-    Crafty.sprite(40, 'assets/alien2.png', {alien: [0,0]});
+    Crafty.sprite(50, 'assets/astro2.png', {player: [0, 0]});
+    Crafty.sprite(40, 'assets/alien2.png', {alien: [0, 0]});
+    Crafty.sprite(40, 'assets/fuel.png', {fuel: [0, 0]});
     
     //place the our Hero
     Crafty.scene("main", function() {
@@ -35,16 +37,23 @@ window.onload = function() {
              .image("assets/mars2.png", "repeat");
 
 		player = Crafty.e('2D, DOM, player, RightControls, Hero, Collision, Solid')
-			.attr({x: mapXCenter, y: mapYCenter})
+			.attr({x: mapXCenter, y: mapYCenter, z: 3})
 	        .rightControls(3);
 	    Crafty.viewport.follow(player);
 
 	    //aliens
 	    for (var i = 0; i < 20; i++) {
 	    	Crafty.e('2D, DOM, alien, Martian')
-	    	.attr({x: Crafty.math.randomInt(40, (MAPWIDTH - 40)), y: Crafty.math.randomInt(40, (MAPHEIGHT - 40))});
-	    };
+	    	.attr({x: Crafty.math.randomInt(40, (MAPWIDTH - 40)), y: Crafty.math.randomInt(40, (MAPHEIGHT - 40)), z: 2});
+	    }
 
+	    // radio-active fuel
+	    for (var i = 0; i < 15; i++) {
+	    	Crafty.e('2D, DOM, fuel, SpriteAnimation, Collision')
+	    	.attr({x: Crafty.math.randomInt(40, (MAPWIDTH - 40)), y: Crafty.math.randomInt(40, (MAPHEIGHT - 40)), z: 1})
+			.animate('flashing', 0, 0, 2)
+			.animate('flashing', 1, -1);
+		}
 	});
 
 	Crafty.scene("loading", function() {
@@ -53,7 +62,7 @@ window.onload = function() {
         Crafty.load(["assets/astro2.png", "assets/mars2.png"], 
         	function() {
         		setTimeout( 
-        			function() {Crafty.scene("main"); },1000);
+        			function() {Crafty.scene("main"); }, 500);
         	}
         );
 
