@@ -23,11 +23,13 @@ window.onload = function() {
 	var mapXCenter = MAPWIDTH/2
 	var mapYCenter = MAPHEIGHT/2
 	Crafty.init();
-	Crafty.canvas.init();
+//	Crafty.canvas.init();
 	
     Crafty.sprite(50, 'assets/astro2.png', {player: [0, 0]});
     Crafty.sprite(40, 'assets/alien2.png', {alien: [0, 0]});
-    Crafty.sprite(40, 'assets/fuel.png', {fuel: [0, 0]});
+    Crafty.sprite(30, 'assets/fuel.png', {fuel: [0, 0]});
+    Crafty.sprite(30, 'assets/fixer.png', {fixer: [0, 0]});
+
     
     //place the our Hero
     Crafty.scene("main", function() {
@@ -36,9 +38,19 @@ window.onload = function() {
              .attr({w: MAPWIDTH, h: MAPHEIGHT})
              .image("assets/mars2.png", "repeat");
 
-		player = Crafty.e('2D, DOM, player, RightControls, Hero, Collision, Solid')
+		player = Crafty.e('2D, DOM, player, RightControls, Hero, Collision, Solid, Keyboard')
 			.attr({x: mapXCenter, y: mapYCenter, z: 3})
 	        .rightControls(3);
+//	       	.bind('KeyDown', function () { if (this.isDown(32)) {fireFixer();} });
+
+//		var fireFixer = function() {
+//			Crafty.e('2D, DOM, Collision, SpriteAnimation, fixer')
+//				.attr({x: player.x + 20, y: player.y +15, z: 4})
+//				.animate('west',0,3,4)
+//				.animate('west', 1, 60);
+//
+//		};
+
 	    Crafty.viewport.follow(player);
 
 	    //aliens
@@ -51,8 +63,8 @@ window.onload = function() {
 	    for (var i = 0; i < 15; i++) {
 	    	Crafty.e('2D, DOM, fuel, SpriteAnimation, Collision')
 	    	.attr({x: Crafty.math.randomInt(40, (MAPWIDTH - 40)), y: Crafty.math.randomInt(40, (MAPHEIGHT - 40)), z: 1})
-			.animate('flashing', 0, 0, 2)
-			.animate('flashing', 1, -1);
+			.animate('flashing', 0, 0, 1)
+			.animate('flashing', 2, -1);
 		}
 	});
 
@@ -65,7 +77,6 @@ window.onload = function() {
         			function() {Crafty.scene("main"); }, 500);
         	}
         );
-
     });
 
     Crafty.scene("loading");
@@ -113,8 +124,8 @@ window.onload = function() {
 				if (this.hit('Solid')) {
 					this.attr({x: from.x, y: from.y});
 				}
-			});
-		return this;	
+			})
+//		return this;	
     	}
     });
 	
@@ -150,7 +161,7 @@ window.onload = function() {
             			direction = directions[0];
             		}
 
-            		direction = pickNewDirection();
+            		var direction = pickNewDirection();
             		this.animate(direction.name, 12);
             		this.x += direction.x;
             		this.y += direction.y;
@@ -160,7 +171,16 @@ window.onload = function() {
 
             	});
             	// do something with the collision here:
-            	this.onHit('Hero', function() {console.log('impact!')});
+            	this.onHit('fuel', function() {mutate(this);});
+
+            	var mutate = function(obj) {
+            	obj.requires('SpriteAnimation, Collision')
+            		.animate('north',0,1,1)
+            		.animate('east',2,1,3)
+            		.animate('south',4,1,5)
+            		.animate('west',6,1,7);
+            	obj.mutated = true;
+            	};
 
             	// change directions every three seconds
             	var pickNewDirection = function() {
@@ -172,7 +192,7 @@ window.onload = function() {
 
 		}
 	});
-
+	
 
     // Directional input component
     Crafty.c('RightControls', {

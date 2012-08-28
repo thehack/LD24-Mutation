@@ -9,3 +9,7 @@ Our hero survives a crash landing on the Martian surface, but the ship doesn't. 
 ##The In-Progress Game
 http://thehack.github.com/LD24-Mutation/mutation.html
 
+working on the firing gun. needs to fire from the correct direction.
+
+I made a pretty cool little tool for choosing the the direction as needed for the first .animate command. (of the alien). I think I can extract it out, make it a component, and use it for all the gun and hero as well. 
+
