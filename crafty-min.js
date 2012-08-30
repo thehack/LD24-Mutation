@@ -16,13 +16,14 @@
 
 window.onload = function() {
 
-	var VIEWPORTWIDTH = 960;
-	var VIEWPORTHEIGHT = 480;
-	var MAPWIDTH = 1600;
-	var MAPHEIGHT = 1200;
+	var VIEWPORTWIDTH = 720;
+	var VIEWPORTHEIGHT = 520;
+	var MAPWIDTH = 1280;
+	var MAPHEIGHT = 1280;
 	var mapXCenter = MAPWIDTH/2
 	var mapYCenter = MAPHEIGHT/2
-	Crafty.init();
+
+	Crafty.init(VIEWPORTWIDTH, VIEWPORTHEIGHT);
 //	Crafty.canvas.init();
 	
     Crafty.sprite(50, 'assets/astro2.png', {player: [0, 0]});
@@ -32,6 +33,62 @@ window.onload = function() {
 
     
     //place the our Hero
+
+ 	Crafty.scene("loading", function() {
+		Crafty.background('#cccccc');
+		Crafty.e("2D, DOM, Text").attr({ x: (VIEWPORTWIDTH/2 -30), y: VIEWPORTHEIGHT/2 }).text("Loading...")
+		.textFont({ size: '36', family: 'Arial' });
+		Crafty.audio.add({
+			oC: ["assets/oC.wav",
+					"assets/oC.mp3",
+					"assets/oC.ogg"]				
+			});
+        Crafty.load(["assets/astro2.png", "assets/mars2.png", 'assets/space.png'], 
+        	function() {
+        		setTimeout( 
+        			function() {Crafty.scene("story1"); }, 500);
+        			Crafty.audio.play("oC",1,1);
+        	}
+        );
+    });
+ 	Crafty.scene('story1', function() {
+ 		Crafty.e("2D, DOM, Text").attr({ x: (50), y: 200, w: 600 })
+ 		.text("You have been selected to complete human-kind's first manned flight to Mars.");
+;
+ 		setTimeout(function() {Crafty.scene("story2"); }, 4500); 
+
+     
+
+ 	});
+ 	 	Crafty.scene('story2', function() {
+ 		Crafty.e("2D, DOM, Text").attr({ x: (50), y: 200, w: 600 })
+ 		.text("After nearly one year of spaceflight, your craft is approaching the Big Red Planet.");
+ 		
+ 		setTimeout( 
+        			function() {Crafty.scene("space"); }, 4500);
+
+ 	});
+
+ 	Crafty.scene('space', function(){
+ 		Crafty.e('2D, DOM, Image')
+ 			.attr({x: 0, y: 0})
+ 			.image('assets/space.png','no-repeat')
+
+ 			// This is a poor work-around for the zoom function not working as it should
+ 			.bind('EnterFrame', function() {
+ 				if (Crafty.frame() % 3 == 0) {
+ 					Crafty.viewport.zoom(1.006, (VIEWPORTWIDTH/2), (VIEWPORTHEIGHT/2), 1);
+ 				}
+ 			//	console.log(this.h);
+ 			});
+// 		Crafty.viewport.zoom(2, VIEWPORTWIDTH/2, VIEWPORTHEIGHT/2, 800);
+ 		setTimeout(function() {
+ 			Crafty.viewport.zoom(0, VIEWPORTWIDTH/2, VIEWPORTHEIGHT/2, 1);
+			Crafty.scene("main"); }, 3500);
+    });
+
+    Crafty.scene("loading");
+
     Crafty.scene("main", function() {
     	
     	Crafty.e("2D, DOM, Image")
@@ -67,19 +124,6 @@ window.onload = function() {
 			.animate('flashing', 2, -1);
 		}
 	});
-
-	Crafty.scene("loading", function() {
-		Crafty.background('#cccccc');
-		Crafty.e("2D, DOM, Text").attr({ x: (VIEWPORTWIDTH/2 -30), y: VIEWPORTHEIGHT/2 }).text("Loading...");
-        Crafty.load(["assets/astro2.png", "assets/mars2.png"], 
-        	function() {
-        		setTimeout( 
-        			function() {Crafty.scene("main"); }, 500);
-        	}
-        );
-    });
-
-    Crafty.scene("loading");
 
     // Components
     Crafty.c('Hero', {
